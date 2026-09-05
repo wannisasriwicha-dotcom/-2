@@ -1,0 +1,172 @@
+-- สร้าง ScreenGui และตั้งค่า CoreGui
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local Title = Instance.new("TextLabel")
+local ToggleButton = Instance.new("TextButton")
+local SpinToggle = Instance.new("TextButton")
+local StealEggBtn = Instance.new("TextButton")
+local UICorner1 = Instance.new("UICorner")
+local UICorner2 = Instance.new("UICorner")
+local UICorner3 = Instance.new("UICorner")
+local UICorner4 = Instance.new("UICorner")
+local UICorner5 = Instance.new("UICorner")
+
+ScreenGui.Name = "BemorMenu"
+ScreenGui.Parent = game:GetService("CoreGui")
+ScreenGui.ResetOnSpawn = false
+
+-- ปุ่มลอย เปิด/ปิด เมนูหลัก (หน้าจอ)
+ToggleButton.Name = "ToggleButton"
+ToggleButton.Parent = ScreenGui
+ToggleButton.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
+ToggleButton.Position = UDim2.new(0, 10, 0.4, 0)
+ToggleButton.Size = UDim2.new(0, 80, 0, 35)
+ToggleButton.Font = Enum.Font.SourceSansBold
+ToggleButton.Text = "Bemor"
+ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.TextSize = 18.000
+ToggleButton.Active = true
+ToggleButton.Draggable = true
+
+UICorner1.CornerRadius = UDim.new(0, 8)
+UICorner1.Parent = ToggleButton
+
+-- กรอบเมนูหลัก (สีฟ้า)
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(20, 30, 45)
+MainFrame.BorderColor3 = Color3.fromRGB(0, 170, 255)
+MainFrame.BorderSizePixel = 2
+MainFrame.Position = UDim2.new(0.35, 0, 0.3, 0)
+MainFrame.Size = UDim2.new(0, 260, 0, 220)
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Visible = true
+
+UICorner2.CornerRadius = UDim.new(0, 10)
+UICorner2.Parent = MainFrame
+
+-- หัวข้อเมนู "Bemor"
+Title.Name = "Title"
+Title.Parent = MainFrame
+Title.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+Title.Size = UDim2.new(1, 0, 0, 40)
+Title.Font = Enum.Font.SourceSansBold
+Title.Text = "Bemor Script"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 22.000
+
+UICorner3.CornerRadius = UDim.new(0, 10)
+UICorner3.Parent = Title
+
+-- โหมดที่ 1: หมุน 360 องศา
+SpinToggle.Name = "SpinToggle"
+SpinToggle.Parent = MainFrame
+SpinToggle.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
+SpinToggle.Position = UDim2.new(0.08, 0, 0.26, 0)
+SpinToggle.Size = UDim2.new(0.84, 0, 0, 40)
+SpinToggle.Font = Enum.Font.SourceSans
+SpinToggle.Text = "โหมด 1: หมุน 360 องศา [ปิด]"
+SpinToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+SpinToggle.TextSize = 15.000
+
+UICorner4.CornerRadius = UDim.new(0, 6)
+UICorner4.Parent = SpinToggle
+
+-- โหมดที่ 2: บินไปขโมยไข่ (สปีด 800)
+StealEggBtn.Name = "StealEggBtn"
+StealEggBtn.Parent = MainFrame
+StealEggBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
+StealEggBtn.Position = UDim2.new(0.08, 0, 0.52, 0)
+StealEggBtn.Size = UDim2.new(0.84, 0, 0, 40)
+StealEggBtn.Font = Enum.Font.SourceSans
+StealEggBtn.Text = "โหมด 2: บินไปขโมยไข่ (Speed 800)"
+StealEggBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+StealEggBtn.TextSize = 15.000
+
+UICorner5.CornerRadius = UDim.new(0, 6)
+UICorner5.Parent = StealEggBtn
+
+-- =====================================
+-- ระบบการทำงาน (Logic)
+-- =====================================
+
+-- ระบบเปิด/ปิด เมนู
+ToggleButton.MouseButton1Click:Connect(function()
+    MainFrame.Visible = not MainFrame.Visible
+end)
+
+-- โหมดที่ 1: หมุน 360 องศา
+local spinning = false
+local spinSpeed = 25
+
+SpinToggle.MouseButton1Click:Connect(function()
+    spinning = not spinning
+    if spinning then
+        SpinToggle.Text = "โหมด 1: หมุน 360 องศา [เปิด]"
+        SpinToggle.BackgroundColor3 = Color3.fromRGB(0, 200, 100)
+    else
+        SpinToggle.Text = "โหมด 1: หมุน 360 องศา [ปิด]"
+        SpinToggle.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
+    end
+end)
+
+game:GetService("RunService").RenderStepped:Connect(function()
+    if spinning then
+        local player = game.Players.LocalPlayer
+        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            player.Character.HumanoidRootPart.CFrame = player.Character.HumanoidRootPart.CFrame * CFrame.Angles(0, math.rad(spinSpeed), 0)
+        end
+    end
+end)
+
+-- โหมดที่ 2: ฟังก์ชันบินไปหาไข่ด้วยความเร็ว 800
+local flySpeed = 800
+
+local function flyToLocation(targetCFrame)
+    local player = game.Players.LocalPlayer
+    local character = player.Character
+    if not character or not character:FindFirstChild("HumanoidRootPart") then return end
+    
+    local hrp = character.HumanoidRootPart
+    local distance = (targetCFrame.Position - hrp.Position).Magnitude
+    local duration = distance / flySpeed
+    
+    local tweenInfo = TweenInfo.new(duration, Enum.EasingStyle.Linear)
+    local tween = game:GetService("TweenService"):Create(hrp, tweenInfo, {CFrame = targetCFrame})
+    
+    tween:Play()
+end
+
+-- ระบบค้นหาวัตถุไข่ในแมพและบินไปหา
+StealEggBtn.MouseButton1Click:Connect(function()
+    local targetEgg = nil
+    
+    -- ค้นหาวัตถุใน Workspace ที่มีคำว่า "Egg"
+    for _, obj in pairs(workspace:GetDescendants()) do
+        if obj:IsA("BasePart") or obj:IsA("Model") then
+            if string.find(string.lower(obj.Name), "egg") then
+                targetEgg = obj
+                break
+            end
+        end
+    end
+    
+    if targetEgg then
+        StealEggBtn.Text = "กำลังบินไปขโมยไข่..."
+        StealEggBtn.BackgroundColor3 = Color3.fromRGB(255, 170, 0)
+        
+        local eggCFrame = targetEgg:IsA("Model") and targetEgg:GetPivot() or targetEgg.CFrame
+        flyToLocation(eggCFrame)
+        
+        task.wait(1.5)
+        StealEggBtn.Text = "โหมด 2: บินไปขโมยไข่ (Speed 800)"
+        StealEggBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
+    else
+        StealEggBtn.Text = "ไม่พบไข่ในบริเวณนี้!"
+        StealEggBtn.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+        task.wait(1.5)
+        StealEggBtn.Text = "โหมด 2: บินไปขโมยไข่ (Speed 800)"
+        StealEggBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
+    end
+end)
